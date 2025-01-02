@@ -1,0 +1,12 @@
+DB_TYPE: postgres
+DB: postgres://sam:password@localhost:5432/blog_development?sslmode=disable
+
+tables:
+  - name: authors
+    schema: public
+  - name: posts
+    schema: public
+  - name: comments
+    schema: public
+
+log_level: debug
