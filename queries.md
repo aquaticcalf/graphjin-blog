@@ -186,3 +186,61 @@ mutation {
   }
 }
 ```
+
+### delete an author
+
+```gql
+mutation {
+  authors(delete: true, where: { id: { eq: 1 } }) {
+    id
+    name
+    email
+  }
+}
+```
+
+### delete a post
+
+```gql
+mutation {
+  posts(delete: true, where: { id: { eq: 1 } }) {
+    id
+    title
+    content
+  }
+}
+```
+
+### delete a comment
+
+```gql
+mutation {
+  comments(delete: true, where: { id: { eq: 1 } }) {
+    id
+    content
+    created_at
+  }
+}
+```
+
+### delete multiple posts
+
+```gql
+mutation {
+  posts(delete: true, where: { author_id: { eq: 1 } }) {
+    id
+    title
+  }
+}
+```
+
+### delete multiple comments
+
+```gql
+mutation {
+  comments(delete: true, where: { post_id: { eq: 1 } }) {
+    id
+    content
+  }
+}
+```
