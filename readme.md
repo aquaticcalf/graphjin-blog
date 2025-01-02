@@ -156,14 +156,14 @@ Applying approved migration (2 statements in total):
   -------------------------                                                                          -- 1.210299ms
   -- 1 migration
   -- 2 sql statements
-  ``` 
+``` 
 
-  > it works yayy
+> it works yayy
 
-  - change this in `config/scripts/dev.yml`
+- change this in `config/scripts/dev.yml`
 
-  ```yml
-  database:
+```yml
+database:
     type: postgres
     host: localhost
     port: 5432
@@ -171,4 +171,160 @@ Applying approved migration (2 statements in total):
     user: sam
     password: password
     schema: "public"
-  ```
+```
+
+- write basic blog schema in schema.hcl
+
+```hcl
+table "authors" {
+  schema = schema.public
+  column "id" {
+    null = false
+    type = sql("serial")
+  }
+  column "name" {
+    null = false
+    type = sql("character varying(255)")
+  }
+  column "email" {
+    null = false
+    type = sql("character varying(255)")
+  }
+  column "bio" {
+    null = true
+    type = sql("text")
+  }
+}
+
+table "posts" {
+  schema = schema.public
+  column "id" {
+    null = false
+    type = sql("serial")
+  }
+  column "title" {
+    null = false
+    type = sql("text")
+  }
+  column "content" {
+    null = false
+    type = sql("text")
+  }
+  column "author_id" {
+    null = false
+    type = sql("integer")
+  }
+  column "created_at" {
+    null = false
+    type = sql("timestamp")
+  }
+}
+
+table "comments" {
+  schema = schema.public
+  column "id" {
+    null = false
+    type = sql("serial")
+  }
+  column "post_id" {
+    null = false
+    type = sql("integer")
+  }
+  column "author_id" {
+    null = false
+    type = sql("integer")
+  }
+  column "content" {
+    null = false
+    type = sql("text")
+  }
+  column "created_at" {
+    null = false
+    type = sql("timestamp")
+  }
+}
+
+schema "public" {
+  comment = "schema for blog website"
+}
+
+schema "private" {}
+```
+
+- migrations
+
+```sh
+atlas schema apply --url "postgres://sam:password@localhost:5432/blog_development?sslmode=disable" --to "file://schema.hcl"
+```
+
+```sh
+Planning migration statements (4 in total):
+
+  -- set comment to schema: "public":
+    -> COMMENT ON SCHEMA "public" IS 'schema for blog website';
+  -- create "authors" table:
+    -> CREATE TABLE "public"."authors" (
+         "id" serial NOT NULL,
+         "name" character varying(255) NOT NULL,
+         "email" character varying(255) NOT NULL,
+         "bio" text NULL
+       );
+  -- create "posts" table:
+    -> CREATE TABLE "public"."posts" (
+         "id" serial NOT NULL,
+         "title" text NOT NULL,
+         "content" text NOT NULL,
+         "author_id" integer NOT NULL,
+         "created_at" timestamp NOT NULL
+       );
+  -- create "comments" table:
+    -> CREATE TABLE "public"."comments" (
+         "id" serial NOT NULL,
+         "post_id" integer NOT NULL,
+         "author_id" integer NOT NULL,
+         "content" text NOT NULL,
+         "created_at" timestamp NOT NULL
+       );
+
+-------------------------------------------
+
+Applying approved migration (4 statements in total):
+
+  -- set comment to schema: "public"
+    -> COMMENT ON SCHEMA "public" IS 'schema for blog website';
+  -- ok (498.846µs)
+
+  -- create "authors" table
+    -> CREATE TABLE "public"."authors" (
+         "id" serial NOT NULL,
+         "name" character varying(255) NOT NULL,
+         "email" character varying(255) NOT NULL,
+         "bio" text NULL
+       );
+  -- ok (5.388393ms)
+
+  -- create "posts" table
+    -> CREATE TABLE "public"."posts" (
+         "id" serial NOT NULL,
+         "title" text NOT NULL,
+         "content" text NOT NULL,
+         "author_id" integer NOT NULL,
+         "created_at" timestamp NOT NULL
+       );
+  -- ok (3.874735ms)
+
+  -- create "comments" table
+    -> CREATE TABLE "public"."comments" (
+         "id" serial NOT NULL,
+         "post_id" integer NOT NULL,
+         "author_id" integer NOT NULL,
+         "content" text NOT NULL,
+         "created_at" timestamp NOT NULL
+       );
+  -- ok (3.114995ms)
+
+  -------------------------
+  -- 13.391806ms
+  -- 1 migration
+  -- 4 sql statements
+```
