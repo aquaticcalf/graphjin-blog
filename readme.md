@@ -328,3 +328,4 @@ Applying approved migration (4 statements in total):
   -- 1 migration
   -- 4 sql statements
 ```
+

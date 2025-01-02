@@ -1,0 +1,19 @@
+query {
+  posts {
+    id
+    title
+    content
+    createdAt
+    author {
+      name
+      email
+    }
+    comments {
+      content
+      author {
+        name
+      }
+      createdAt
+    }
+  }
+}
