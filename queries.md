@@ -116,30 +116,3 @@ mutation {
 }
 
 ```
-
-### create author with posts
-
-```gql
-mutation {
-  insert_authors(objects: {
-    name: "jane doe",
-    email: "janedoe@example.com",
-    bio: "a passionate author.",
-    posts: {
-      data: [
-        {title: "getting started with go", content: "basics of go programming."},
-        {title: "advanced go concepts", content: "diving deep into go."}
-      ]
-    }
-  }) {
-    returning {
-      id
-      name
-      posts {
-        id
-        title
-      }
-    }
-  }
-}
-```
