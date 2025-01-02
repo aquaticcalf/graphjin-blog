@@ -9,20 +9,6 @@ query {
     name
     email
     bio
-    posts {
-      id
-      title
-      created_at
-    }
-    comments {
-      id
-      content
-      created_at
-      post {
-        id
-        title
-      }
-    }
   }
 }
 ```
@@ -36,20 +22,7 @@ query {
     title
     content
     created_at
-    author {
-      id
-      name
-      email
-    }
-    comments {
-      id
-      content
-      created_at
-      author {
-        id
-        name
-      }
-    }
+    author_id
   }
 }
 ```
@@ -62,14 +35,8 @@ query {
     id
     content
     created_at
-    author {
-      id
-      name
-    }
-    post {
-      id
-      title
-    }
+    author_id
+    post_id
   }
 }
 ```
@@ -77,17 +44,15 @@ query {
 ### create author 
 ```gql
 mutation {
-  insert_authors(objects: {
+  authors(insert: {
     name: "john doe",
     email: "johndoe@example.com",
     bio: "an author who loves writing about technology."
   }) {
-    returning {
       id
       name
       email
     }
-  }
 }
 ```
 
@@ -95,16 +60,14 @@ mutation {
 
 ```gql
 mutation {
-  insert_posts(objects: {
+  posts(insert: {
     title: "graphql and go",
     content: "an introduction to using graphql with go using graphjin.",
     author_id: 1
   }) {
-    returning {
-      id
-      title
-      created_at
-    }
+    id
+    title
+    created_at
   }
 }
 ```
@@ -113,16 +76,14 @@ mutation {
 
 ```gql
 mutation {
-  insert_comments(objects: {
+  comments(insert: {
     content: "this post was super helpful!",
     post_id: 1,
     author_id: 2
   }) {
-    returning {
-      id
-      content
-      created_at
-    }
+    id
+    content
+    created_at
   }
 }
 ```
@@ -131,14 +92,12 @@ mutation {
 
 ```gql
 mutation {
-  insert_posts(objects: [
+  posts(insert: [
     {title: "introduction to go", content: "go is a statically typed, compiled language.", author_id: 1},
     {title: "building rest apis", content: "learn how to build restful apis with go.", author_id: 1}
   ]) {
-    returning {
-      id
-      title
-    }
+    id
+    title
   }
 }
 ```
@@ -147,16 +106,15 @@ mutation {
 
 ```gql
 mutation {
-  insert_comments(objects: [
+  comments(insert: [
     {content: "great post!", post_id: 1, author_id: 2},
     {content: "i learned a lot from this.", post_id: 2, author_id: 3}
   ]) {
-    returning {
-      id
-      content
-    }
+    id
+    content
   }
 }
+
 ```
 
 ### create author with posts

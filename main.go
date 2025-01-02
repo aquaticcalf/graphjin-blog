@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -10,7 +12,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
 )
 
 type Config struct {
@@ -23,8 +24,13 @@ type Config struct {
 	} `yaml:"tables"`
 }
 
-func main() {
+type GraphQLRequest struct {
+	Query         string                 `json:"query"`
+	OperationName string                 `json:"operationName"`
+	Variables     map[string]interface{} `json:"variables"`
+}
 
+func main() {
 	config_data, err := ioutil.ReadFile("config.yaml")
 	if err != nil {
 		log.Fatalf("error reading config.yaml: %v", err)
@@ -46,29 +52,35 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// example
-	query := `
-        query getPosts {
-            posts {
-                id
-                title
-                content
-                created_at
-            }
-        }`
-
-
 	router := chi.NewRouter()
-	router.Get("/", func(w http.ResponseWriter, request *http.Request) {
-		ctx := context.WithValue(request.Context(), core.UserIDKey, 1)
-		res, err := gj.GraphQL(ctx, query, nil, nil)
+	router.Post("/", func(w http.ResponseWriter, r *http.Request) {
+		var req GraphQLRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	
+		ctx := context.WithValue(r.Context(), core.UserIDKey, 1)
+	
+		var variables_raw json.RawMessage
+		if req.Variables != nil {
+			variables_raw, err = json.Marshal(req.Variables)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+	
+		res, err := gj.GraphQL(ctx, req.Query, variables_raw, nil)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+	
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(res.Data)
 	})
+	
 
 	log.Println("go server started on port 3000")
 	if err := http.ListenAndServe(":3000", router); err != nil {

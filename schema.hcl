@@ -39,6 +39,7 @@ table "posts" {
   column "created_at" {
     null = false
     type = sql("timestamp")
+    default = "now"
   }
 }
 
@@ -63,6 +64,7 @@ table "comments" {
   column "created_at" {
     null = false
     type = sql("timestamp")
+    default = "now"
   }
 }
 
