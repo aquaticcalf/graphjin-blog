@@ -16,6 +16,10 @@ table "authors" {
     null = true
     type = sql("text")
   }
+  
+  primary_key {
+    columns = [column.id]
+  }
 }
 
 table "posts" {
@@ -41,6 +45,17 @@ table "posts" {
     type = sql("timestamp")
     default = "now"
   }
+  
+  primary_key {
+    columns = [column.id]
+  }
+  
+  foreign_key "author_fk" {
+    columns = [column.author_id]
+    ref_columns = [table.authors.column.id]
+    on_delete = CASCADE
+    on_update = CASCADE
+  }
 }
 
 table "comments" {
@@ -65,6 +80,24 @@ table "comments" {
     null = false
     type = sql("timestamp")
     default = "now"
+  }
+  
+  primary_key {
+    columns = [column.id]
+  }
+  
+  foreign_key "post_fk" {
+    columns = [column.post_id]
+    ref_columns = [table.posts.column.id]
+    on_delete = CASCADE
+    on_update = CASCADE
+  }
+  
+  foreign_key "author_fk" {
+    columns = [column.author_id]
+    ref_columns = [table.authors.column.id]
+    on_delete = CASCADE
+    on_update = CASCADE
   }
 }
 

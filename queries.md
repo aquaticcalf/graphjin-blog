@@ -22,7 +22,20 @@ query {
     title
     content
     created_at
-    author_id
+    author {
+      id
+      name
+      email
+    }
+    comments {
+      id
+      content
+      created_at
+      author {
+        id
+        name
+      }
+    }
   }
 }
 ```
@@ -31,12 +44,31 @@ query {
 
 ```gql
 query {
-  comments(where: {post_id: {eq: 1}}) {
+  comments(where: { post_id: { eq: 1 } }) {
     id
     content
     created_at
-    author_id
-    post_id
+    author {
+      id
+      name
+      email
+    }
+    post {
+      id
+      title
+    }
+  }
+}
+```
+
+### specific author posts
+```gql
+query {
+  posts(where: { author_id: { eq: 1 } }) {
+    id
+    title
+    content
+    created_at
   }
 }
 ```
@@ -114,5 +146,43 @@ mutation {
     content
   }
 }
+```
 
+### new example queries and mutations
+
+```gql
+query {
+  comments {
+    id
+    content
+    created_at
+    post {
+      id 
+      title 
+      created_at 
+      author { 
+        name 
+        email 
+      }
+    }
+    author {
+      id 
+      name 
+      email 
+      bio 
+    }
+  }
+}
+```
+
+### update an author's details
+
+```gql
+mutation {
+  authors(update: { where: { id: { eq: 1 } }, data: { name: "jane doe", bio: "updated bio" } }) {
+    id 
+    name 
+    bio 
+  }
+}
 ```
